@@ -96,10 +96,12 @@ namespace Umbraco.Web.Editors
         public JsonNetResult LocalizedText(string culture = null)
         {
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
-                //if the user is logged in, get their culture, otherwise default to 'en'
+                //if the user is logged in, get their culture, otherwise use DefaultUILanguage if set or default to 'en'
                 ? Security.IsAuthenticated()
                     ? Security.CurrentUser.GetUserCulture(Services.TextService)
-                    : CultureInfo.GetCultureInfo("en")
+                    : string.IsNullOrWhiteSpace(GlobalSettings.DefaultUILanguage)
+                        ? CultureInfo.GetCultureInfo("en")
+                        : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
             var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
